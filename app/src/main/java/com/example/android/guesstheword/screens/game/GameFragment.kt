@@ -30,25 +30,17 @@ import androidx.navigation.fragment.NavHostFragment
 import com.example.android.guesstheword.R
 import com.example.android.guesstheword.databinding.GameFragmentBinding
 
-/**
- * Fragment where the game is played
- */
 class GameFragment : Fragment() {
 
     private lateinit var viewModel: GameViewModel
-
-    // Binding Referansı
     private lateinit var binding: GameFragmentBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        // Fragment ya da Activity yaşam süresi boyunca bir ViewModel üzerinden yürüyecek.
-        // Kritik nokta GameViewModel 1 kere oluşturulur.
-        Log.i("GameFragment", "Called ViewModelProviders.of")
+
         viewModel = ViewModelProviders.of(this).get(GameViewModel::class.java)
 
-        // Inflate view and obtain an instance of the binding class
         binding = DataBindingUtil.inflate(
                 inflater,
                 R.layout.game_fragment,
@@ -56,66 +48,18 @@ class GameFragment : Fragment() {
                 false
         )
 
+        binding.gameViewModel = viewModel
+        binding.lifecycleOwner = this
 
-        // Observer
-        viewModel.score.observe(this, Observer { newScore ->
+        viewModel.eventGameFinish.observe(this, Observer<Boolean> { hasFinished ->
 
-            binding.scoreText.text = newScore.toString()
-
-        })
-
-        viewModel.word.observe(this, Observer { newWord ->
-
-            binding.wordText.text = newWord.toString()
+            if (hasFinished) gameFinished()
 
         })
 
-        viewModel.eventGameFinish.observe(this, Observer<Boolean> { hasFinished->
-
-            if(hasFinished) gameFinished()
-
-        })
-
-
-
-
-
-
-        binding.correctButton.setOnClickListener { onCorrect() }
-        binding.skipButton.setOnClickListener { onSkip() }
-        binding.endGameButton.setOnClickListener { onEndGame() }
-        //updateScoreText() - Observer
-        //updateWordText() - Observer
         return binding.root
 
     }
-
-
-    /** Methods for buttons presses **/
-
-    private fun onSkip() {
-        viewModel.onSkip()
-        //updateWordText()
-        //updateScoreText()
-    }
-
-    private fun onCorrect() {
-        viewModel.onCorrect()
-        //updateScoreText()
-        //updateWordText()
-    }
-
-
-    /** Methods for updating the UI **/
-
-   /* private fun updateWordText() {
-        binding.wordText.text = viewModel.word.value
-    }
-
-    private fun updateScoreText() {
-        binding.scoreText.text = viewModel.score.value.toString()
-    }*/
-
 
     private fun gameFinished() {
         Toast.makeText(activity, "Game has just finished", Toast.LENGTH_SHORT).show()
@@ -125,8 +69,5 @@ class GameFragment : Fragment() {
         viewModel.onGameFinish()
     }
 
-    private fun onEndGame() {
-        gameFinished()
-    }
 
 }

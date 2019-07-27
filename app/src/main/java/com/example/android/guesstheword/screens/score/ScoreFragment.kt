@@ -29,9 +29,6 @@ import androidx.navigation.fragment.navArgs
 import com.example.android.guesstheword.R
 import com.example.android.guesstheword.databinding.ScoreFragmentBinding
 
-/**
- * Fragment where the final score is shown, after the game is over
- */
 class ScoreFragment : Fragment() {
 
     private lateinit var viewModel: ScoreViewModel
@@ -43,28 +40,18 @@ class ScoreFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
 
-
-        // Inflate view and obtain an instance of the binding class.
         val binding: ScoreFragmentBinding = DataBindingUtil.inflate(
                 inflater,
                 R.layout.score_fragment,
                 container,
                 false
         )
-        /**
-         * Directions aracılığıyla ScoreFragment ' a aktarılan actions değerinin ViewModel'da işlenmesi
-         * için Factory tasarım prensibiyle argümanlı bir ViewModel oluşturup viewModel ' a aktarıyoruz.
-         */
+
         viewModelFactory = ScoreViewModelFactory(ScoreFragmentArgs.fromBundle(arguments!!).score)
         viewModel = ViewModelProviders.of(this,viewModelFactory)
                 .get(ScoreViewModel::class.java)
 
-        viewModel.score.observe(this, Observer { newScore ->
-            binding.scoreText.text = newScore.toString()
-        })
 
-        // observe eklendiği için kaldırıldı
-        //binding.scoreText.text = viewModel.score.toString()
 
         viewModel.eventPlayAgain.observe(this, Observer { playAgain ->
             if (playAgain) {
@@ -73,8 +60,8 @@ class ScoreFragment : Fragment() {
             }
         })
 
-        binding.playAgainButton.setOnClickListener {  viewModel.onPlayAgain()  }
-
+        binding.scoreViewModel = viewModel
+        binding.lifecycleOwner = this
 
         return binding.root
     }
